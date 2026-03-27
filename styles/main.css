@@ -156,7 +156,7 @@ body {
 .btn-sub { font-size: 0.6rem; color: var(--text-tertiary); font-weight: 400; }
 
 /* View Toggles — SECONDARY, muted */
-.dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; width: 100%; max-width: 1400px; }
 .dashboard-header h1 { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
 .view-toggles { display: flex; background: var(--bg-surface); border-radius: 8px; padding: 4px; border: 1px solid var(--border-default); }
 .toggle-btn {
@@ -188,8 +188,8 @@ body {
 }
 
 /* ─── DASHBOARD ─── */
-.dashboard { flex:1; display: flex; flex-direction: column; padding: 14px 20px; overflow: hidden; }
-.view-container { display: none; flex: 1; overflow: hidden; }
+.dashboard { flex:1; display: flex; flex-direction: column; padding: 14px 20px; overflow: hidden; align-items: center; }
+.view-container { display: none; flex: 1; overflow: hidden; width: 100%; max-width: 1400px; }
 .view-container.active { display: flex; }
 
 /* ─── KANBAN ─── */
@@ -219,9 +219,21 @@ body {
 .col-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .column-header h2 { font-size: 0.85rem; font-weight: 600; }
 .count { background: var(--bg-elevated); padding: 1px 7px; border-radius: 10px; font-size: 0.7rem; color: var(--text-tertiary); font-weight: 600; }
-.column-content { flex:1; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; min-height:60px; }
+.column-content { flex:1; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; min-height:60px; position:relative; }
 .column-content::-webkit-scrollbar { width: 3px; }
 .column-content::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 3px; }
+
+/* Empty state message */
+.column-content:empty::after {
+    content: 'Nenhum pedido';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-tertiary);
+    font-size: 0.8rem;
+    font-style: italic;
+    opacity: 0.5;
+}
 
 .drop-placeholder { border:2px dashed var(--brand); border-radius:8px; min-height:48px; background:var(--brand-subtle); transition:.2s; }
 
