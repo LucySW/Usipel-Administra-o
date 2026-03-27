@@ -95,6 +95,7 @@ function normalizeStatus(s) {
 }
 
 async function loadPedidos(search="", statusFilter="Todos") {
+  try {
     const showArchived = document.getElementById('toggleArchived')?.checked;
     
     let query = supabase.from('pedidos').select(`
@@ -106,12 +107,17 @@ async function loadPedidos(search="", statusFilter="Todos") {
         query = query.or('arquivado.eq.0,arquivado.is.null');
     }
 
-    const { data: serverPedidos, error } = await query;
+    let { data: serverPedidos, error } = await query;
     
+    // Fallback: se o join falhar, tenta sem join
     if (error) {
-        console.error("Erro ao carregar pedidos:", error);
-        showToast("Erro de conexão: " + error.message, "error");
-        return;
+        console.warn('Query com join falhou, tentando sem join...', error.message);
+        const fallback = await supabase.from('pedidos').select('*');
+        if (fallback.error) {
+            showToast('Erro de conexão: ' + fallback.error.message, 'error');
+            return;
+        }
+        serverPedidos = fallback.data;
     }
 
     // Processamento e mapeamento
@@ -139,6 +145,12 @@ async function loadPedidos(search="", statusFilter="Todos") {
     renderKanban(allPedidos);
     renderTable(allPedidos);
     updateTimestamps();
+  } catch(err) {
+    console.error('[DIAG] ERRO em loadPedidos:', err);
+    showToast('Erro inesperado: ' + err.message, 'error');
+    const kanbanEl = document.getElementById('col_novo_pedido');
+    if (kanbanEl) kanbanEl.innerHTML = `<div style="padding:20px;color:#ff6b6b;font-size:13px;"><b>ERRO JS:</b> ${err.message}<br><pre style="font-size:11px;margin-top:8px;color:#aaa;">${err.stack?.split('\n').slice(0,4).join('\n')}</pre></div>`;
+  }
 }
 function filterPedidos() {
     activeClientFilter = null; // Reset client filter on manual search
@@ -660,11 +672,16 @@ async function arquivarPedido(id) {
 // ═══════════════════════════
 // INIT
 // ═══════════════════════════
-window.onload = () => {
-    initTheme();
-    setupDragDrop();
-    setupStatusPopover();
-    setupUploadZone();
-    loadPedidos();
-    lucide.createIcons();
+window.onload = async () => {
+    try {
+        initTheme();
+        setupDragDrop();
+        setupStatusPopover();
+        setupUploadZone();
+        lucide.createIcons();
+        await loadPedidos();
+    } catch(err) {
+        console.error('Erro de inicialização:', err);
+        showToast('Erro ao inicializar: ' + err.message, 'error');
+    }
 };

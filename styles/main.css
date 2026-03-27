@@ -125,14 +125,25 @@ body {
 .home-footer { display: flex; align-items: center; gap: 16px; margin-top: auto; }
 .home-version { font-size: 0.8rem; color: var(--text-tertiary); font-weight: 600; }
 
-/* ─── TOP BAR ─── */
-.topbar {
+/* ─── BUTTONS ─── */
+.btn {
     border: none; border-radius: 8px; padding: 8px 14px;
     font-size: 0.82rem; font-weight: 600; cursor: pointer;
     display: inline-flex; align-items: center; gap: 5px;
     transition: all .18s ease; white-space: nowrap;
 }
 .btn:active { transform: scale(0.97); }
+
+/* btn-primary — fallback for elements using this class */
+.btn-primary {
+    background: var(--success); color: #FFF;
+    font-weight: 700; padding: 9px 18px; font-size: 0.84rem;
+    border: none; border-radius: 8px; cursor: pointer;
+}
+.btn-primary:hover { background: var(--success-hover); }
+
+/* btn-spinner — hidden by default */
+.btn-spinner { display: none; }
 
 /* PRIMARY CTA — sole hero button */
 .btn-primary-cta {
@@ -578,3 +589,49 @@ html.light-theme .data-table tbody tr:nth-child(even) td { background-color: rgb
 .toast.show { transform: translateY(0); opacity: 1; }
 .toast.success { border-left: 4px solid var(--success); }
 .toast.error { border-left: 4px solid var(--danger); }
+
+/* ─── RESPONSIVIDADE ─── */
+@media (max-width: 768px) {
+    .topbar {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 10px 12px;
+        gap: 8px;
+    }
+    .topbar-left { order: 1; }
+    .topbar-center { order: 3; width: 100%; padding: 0; }
+    .topbar-center .search-box { max-width: 100%; }
+    .topbar-right { order: 2; margin-left: auto; }
+    .topbar-right .btn span { display: none; }
+    .topbar-divider { display: none; }
+
+    .board { flex-direction: column; overflow-y: auto; }
+    .column { min-width: 100%; flex: none; }
+
+    .order-modal .modal-inner {
+        width: 96%;
+        max-width: 96%;
+        max-height: 92vh;
+        margin: 4vh auto;
+    }
+    .form-cards-grid { grid-template-columns: 1fr; }
+    .form-pair { flex-direction: column; }
+
+    .table-container { overflow-x: auto; }
+    .data-table { min-width: 700px; }
+
+    .dashboard { padding: 10px 12px; }
+    .dashboard-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+    .modules-grid { grid-template-columns: 1fr; }
+    .home-container { padding: 20px; }
+    .home-greeting { font-size: 1.4rem; }
+}
+
+@media (max-width: 480px) {
+    .topbar-left .logo { height: 32px; }
+    .home-logo { height: 72px; }
+    .home-greeting { font-size: 1.2rem; }
+    .toggle-btn { font-size: 0.72rem; padding: 5px 10px; }
+    .order-modal .modal-inner { margin: 2vh auto; max-height: 96vh; }
+}
