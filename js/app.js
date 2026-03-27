@@ -28,8 +28,10 @@ function openAppModule(moduleName) {
     if (moduleName === 'pedidos') {
         document.getElementById('viewHome').classList.remove('active');
         document.getElementById('appContent').style.display = 'flex';
-        // Give a tiny delay for layout to settle before rendering icons if needed
-        setTimeout(() => lucide.createIcons(), 50);
+        setTimeout(() => {
+            lucide.createIcons();
+            loadPedidos(); // Carrega os pedidos ao entrar no módulo
+        }, 50);
     }
 }
 
@@ -72,8 +74,28 @@ function showToast(msg, type="success") {
 let allPedidos = [];
 let activeClientFilter = null;
 
+// Normaliza status legado (ex: 'Novo', 'Entregue') para snake_case usado no app
+function normalizeStatus(s) {
+    if (!s) return 'novo_pedido';
+    const map = {
+        'novo': 'novo_pedido',
+        'novo_pedido': 'novo_pedido',
+        'em producao': 'em_producao',
+        'em_producao': 'em_producao',
+        'producao': 'em_producao',
+        'em produção': 'em_producao',
+        'pronto': 'pronto',
+        'saiu': 'saiu_entrega',
+        'saiu_entrega': 'saiu_entrega',
+        'saiu p/ entrega': 'saiu_entrega',
+        'entregue': 'entregue',
+        'entregue/retirado': 'entregue',
+    };
+    return map[s.toLowerCase().trim()] || 'novo_pedido';
+}
+
 async function loadPedidos(search="", statusFilter="Todos") {
-    const showArchived = document.getElementById('toggleArchived')?.checked ? 1 : 0;
+    const showArchived = document.getElementById('toggleArchived')?.checked;
     
     let query = supabase.from('pedidos').select(`
         *,
@@ -81,20 +103,21 @@ async function loadPedidos(search="", statusFilter="Todos") {
     `);
     
     if (!showArchived) {
-        query = query.eq('arquivado', 0);
+        query = query.or('arquivado.eq.0,arquivado.is.null');
     }
 
     const { data: serverPedidos, error } = await query;
     
     if (error) {
         console.error("Erro ao carregar pedidos:", error);
-        showToast("Erro de conexão", "error");
+        showToast("Erro de conexão: " + error.message, "error");
         return;
     }
 
     // Processamento e mapeamento
-    allPedidos = serverPedidos.map(p => ({
+    allPedidos = (serverPedidos || []).map(p => ({
         ...p,
+        status: normalizeStatus(p.status),
         cliente_nome: p.clientes ? p.clientes.nome : 'Desconhecido',
         cliente_telefone: p.clientes ? p.clientes.telefone : ''
     }));
