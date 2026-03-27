@@ -138,8 +138,10 @@
                 <h1 id="viewTitle" style="margin: 0;">Visão em Quadros</h1>
             </div>
             <div class="view-toggles">
-                <label style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--text-tertiary);cursor:pointer;margin-right:12px;">
-                    <input type="checkbox" id="toggleArchived" onchange="filterPedidos()" style="accent-color:var(--brand);width:14px;height:14px;"> Arquivados
+                <label class="toggle-switch-wrapper" title="Mostrar Pedidos Arquivados">
+                    <span class="toggle-label"><i data-lucide="archive" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;"></i> Arquivados</span>
+                    <input type="checkbox" id="toggleArchived" class="toggle-switch-input" onchange="filterPedidos()">
+                    <span class="toggle-switch-slider"></span>
                 </label>
                 <button class="toggle-btn active" id="btnKanban" onclick="switchView('kanban')">
                     <i data-lucide="kanban" style="width:14px;height:14px;"></i> Quadros
@@ -197,13 +199,13 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th class="sortable" onclick="sortTable(0)">Pedido <i data-lucide="arrow-up-down" style="width:11px;height:11px;vertical-align:middle;opacity:.5;"></i></th>
-                            <th class="sortable" onclick="sortTable(1)">Cliente <i data-lucide="arrow-up-down" style="width:11px;height:11px;vertical-align:middle;opacity:.5;"></i></th>
+                            <th class="sortable" onclick="sortTable(0, this)">Pedido <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                            <th class="sortable" onclick="sortTable(1, this)">Cliente <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
                             <th>Tipo</th>
                             <th class="col-right">Medidas</th>
                             <th>Material</th>
-                            <th class="sortable" onclick="sortTable(5)">Status <i data-lucide="arrow-up-down" style="width:11px;height:11px;vertical-align:middle;opacity:.5;"></i></th>
-                            <th class="sortable col-right" onclick="sortTable(6)">Prazo <i data-lucide="arrow-up-down" style="width:11px;height:11px;vertical-align:middle;opacity:.5;"></i></th>
+                            <th class="sortable" onclick="sortTable(5, this)">Status <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                            <th class="sortable col-right" onclick="sortTable(6, this)">Prazo <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
                             <th style="width:44px;"></th>
                         </tr>
                     </thead>

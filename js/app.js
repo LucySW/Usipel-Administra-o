@@ -44,6 +44,7 @@ function switchView(v) {
     document.getElementById('btnTable').classList.toggle('active', v==='table');
     document.getElementById('viewKanban').classList.toggle('active', v==='kanban');
     document.getElementById('viewTable').classList.toggle('active', v==='table');
+    document.getElementById('viewTitle').innerText = v === 'kanban' ? 'Visão em Quadros' : 'Visão em Tabela';
 }
 
 // ── Sync UI Removed for Web App ──
@@ -213,14 +214,41 @@ function renderKanban(pedidos) {
         card.addEventListener('dblclick', () => editOrder(p.id));
         cols[p.status].appendChild(card);
     });
+    
+    // Inject Empty States
+    STATUS_KEYS.forEach(k => {
+        if (counts[k] === 0) {
+            cols[k].innerHTML = k === 'novo_pedido' ? `
+                <div class="column-empty-state empty-actionable" onclick="openOrderModal()">
+                    <i data-lucide="plus-circle" style="width:24px;height:24px;"></i>
+                    <span style="font-weight:600;">＋ Criar primeiro pedido</span>
+                </div>` : `
+                <div class="column-empty-state">
+                    <i data-lucide="package-open" style="width:24px;height:24px;"></i>
+                    <span>Nenhum pedido</span>
+                </div>`;
+        }
+    });
+
     STATUS_KEYS.forEach(k => document.getElementById(`count_${k}`).innerText = counts[k]);
+    setTimeout(() => lucide.createIcons(), 10);
 }
 
 // ═══════════════════════════
 // TABLE
 // ═══════════════════════════
 let sortCol = -1, sortAsc = true;
-function sortTable(idx) {
+function sortTable(idx, thElement) {
+    if (thElement) {
+        document.querySelectorAll('.sortable').forEach(th => th.classList.remove('active'));
+        thElement.classList.add('active');
+        const icon = thElement.querySelector('.sort-icon');
+        if (icon) {
+            // Se for ascendente, mantemos lucide arrow-up (ou default).
+            // Apenas definimos classe estática ou deixamos opacidade via CSS.
+        }
+    }
+
     sortCol = (sortCol === idx) ? (sortAsc = !sortAsc, idx) : (sortAsc = true, idx);
     allPedidos.sort((a,b) => {
         let va, vb;
@@ -244,6 +272,19 @@ const STATUS_MAP = {
 function renderTable(pedidos) {
     const tbody = document.getElementById("tableBody");
     tbody.innerHTML = "";
+    
+    if (pedidos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8">
+            <div class="table-empty-state">
+                <i data-lucide="package-search" style="width:32px;height:32px;"></i>
+                <span>Nenhum pedido encontrado nesta visualização.</span>
+                <button class="btn-save" style="width:auto;padding:8px 16px;margin-top:10px;" onclick="openOrderModal()"><i data-lucide="plus"></i> Criar Pedido</button>
+            </div>
+        </td></tr>`;
+        setTimeout(() => lucide.createIcons(), 10);
+        return;
+    }
+    
     pedidos.forEach(p => {
         const tr = document.createElement("tr");
         const s = STATUS_MAP[p.status] || { text: p.status, cls: "" };
